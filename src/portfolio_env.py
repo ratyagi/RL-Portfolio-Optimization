@@ -12,14 +12,14 @@ class PortfolioEnv(gym.Env):
     def __init__(self, data_path):
         super(PortfolioEnv, self).__init__()
 
-        # ✅ Load regime-labeled dataset
+        # Load regime-labeled dataset
         self.df = pd.read_csv(data_path)
         self.n_steps = len(self.df)
 
-        # ✅ Action space: 3 discrete actions
+        # Action space: 3 discrete actions
         self.action_space = spaces.Discrete(3)
 
-        # ✅ Observation space: 3 continuous features + 1 discrete regime + 1 position state
+        # Observation space: 3 continuous features + 1 discrete regime + 1 position state
         # Features: Close price, volatility, momentum, regime, position (holding or not)
         low = np.array([0, 0, -np.inf, 0, 0], dtype=np.float32)
         high = np.array([np.inf, np.inf, np.inf, 2, 1], dtype=np.float32)
@@ -40,7 +40,7 @@ class PortfolioEnv(gym.Env):
         done = False
         reward = 0
 
-        # ✅ Calculate reward based on daily return and position
+        # Calculate reward based on daily return and position
         current_return = self.df.loc[self.current_step, 'returns']
         if action == 1:  # Buy
             self.position = 1
@@ -49,10 +49,10 @@ class PortfolioEnv(gym.Env):
 
         reward = self.position * current_return  # Reward = return if holding
 
-        # ✅ Update portfolio value
+        # Update portfolio value
         self.portfolio_value *= (1 + reward)
 
-        # ✅ Move to next day
+        # Move to next day
         self.current_step += 1
         if self.current_step >= self.n_steps - 1:
             done = True
